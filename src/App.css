@@ -1,0 +1,61 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f7f8fc;
+  background: #070b16;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(circle at top, #17213f 0, #0b1020 35%, #070b16 75%); }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.pagina { width: min(980px, 100%); margin: 0 auto; padding: 28px 18px 48px; }
+.hero { padding: 28px 0 24px; }
+.hero h1, .perfil h1 { margin: 8px 0 10px; font-size: clamp(2.3rem, 8vw, 4.6rem); line-height: .95; letter-spacing: -.05em; }
+.hero p { max-width: 760px; margin: 0; color: #bac2d8; font-size: 1.05rem; line-height: 1.65; }
+.selo { display: inline-flex; padding: 7px 10px; border-radius: 999px; background: #e82d69; color: #fff; font-weight: 800; font-size: .78rem; letter-spacing: .08em; }
+
+.cidades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 8px 0 18px; }
+.cidades button { border: 1px solid #27324f; border-radius: 16px; padding: 16px 10px; color: #f7f8fc; background: rgba(15, 22, 42, .82); text-align: left; }
+.cidades button.ativo { outline: 2px solid #e82d69; border-color: transparent; }
+.cidades strong { display: block; font-size: 1.55rem; }
+.cidades span { color: #b8c0d4; font-size: .88rem; }
+
+.filtros { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin: 0 0 18px; }
+.filtros input, .filtros select { width: 100%; border: 1px solid #2b3654; border-radius: 13px; padding: 13px 14px; background: #0e1528; color: #f7f8fc; outline: none; }
+.filtros input:focus, .filtros select:focus { border-color: #e82d69; }
+
+.lista { display: grid; gap: 10px; }
+.card { width: 100%; display: grid; grid-template-columns: 86px 1fr auto; gap: 14px; align-items: center; border: 1px solid #26314d; border-radius: 17px; padding: 14px; color: #f7f8fc; background: rgba(14, 21, 40, .88); text-align: left; transition: transform .16s ease, border-color .16s ease; }
+.card:hover { transform: translateY(-1px); border-color: #596985; }
+.numero { display: grid; place-items: center; min-height: 58px; border-radius: 13px; background: linear-gradient(135deg, #e82d69, #ff7048); font-size: 1.15rem; font-weight: 900; letter-spacing: .04em; }
+.card-texto { display: grid; gap: 3px; }
+.card-texto strong { font-size: 1.05rem; }
+.card-texto span { color: #dce1ef; }
+.card-texto small { color: #8f9ab4; }
+.seta { font-size: 2rem; color: #8f9ab4; }
+
+.estado { border: 1px dashed #394664; border-radius: 16px; padding: 22px; color: #aeb8cf; background: rgba(12, 18, 34, .7); }
+.estado.erro { border-color: #8b3150; color: #ffc4d5; }
+
+.voltar { border: 0; padding: 0; margin: 10px 0 24px; color: #c9d1e4; background: transparent; }
+.perfil { border: 1px solid #293450; border-radius: 24px; padding: clamp(20px, 5vw, 38px); background: rgba(12, 18, 34, .9); }
+.linha-forte { color: #d9deeb; font-weight: 700; }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 18px 0 24px; }
+.tags span { padding: 8px 11px; border-radius: 999px; background: #17213b; color: #cbd3e7; font-size: .86rem; }
+dl { display: grid; gap: 12px; margin: 0; }
+dl div { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 16px; padding: 13px 0; border-bottom: 1px solid #202a42; }
+dt { color: #8f9ab4; font-size: .9rem; }
+dd { margin: 0; color: #edf0f8; }
+.verificacao { display: grid; gap: 4px; margin-top: 24px; padding: 16px; border-radius: 14px; background: #0d2a22; color: #c9f9e7; }
+.verificacao span { font-size: .87rem; opacity: .84; }
+footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid #202a42; color: #6f7a94; font-size: .82rem; }
+
+@media (max-width: 720px) {
+  .cidades { grid-template-columns: repeat(2, 1fr); }
+  .filtros { grid-template-columns: 1fr; }
+  .card { grid-template-columns: 72px 1fr auto; padding: 11px; }
+  dl div { grid-template-columns: 1fr; gap: 4px; }
+}
