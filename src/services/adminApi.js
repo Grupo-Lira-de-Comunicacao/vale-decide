@@ -26,9 +26,10 @@ export function criarAdminApi(supabase = supabaseAdminClient) {
     },
 
     async listar(tabela, { candidateId } = {}) {
-      let query = supabase.from(tabela).select('*').order('created_at', { ascending: false })
+      let query = supabase.from(tabela).select('*')
       if (candidateId) query = query.eq('candidate_id', candidateId)
-      const { data, error } = await query
+      const colunaOrdenacao = tabela === 'editorial_tracking' ? 'updated_at' : 'created_at'
+      const { data, error } = await query.order(colunaOrdenacao, { ascending: false })
       if (error) throw error
       return data || []
     },
