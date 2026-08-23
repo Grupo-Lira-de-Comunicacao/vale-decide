@@ -1,7 +1,9 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import AdminApp from './AdminApp.jsx'
+
+afterEach(() => cleanup())
 
 describe('AdminApp', () => {
   it('mostra login quando usuário não está autenticado', async () => {
@@ -9,6 +11,17 @@ describe('AdminApp', () => {
     render(<AdminApp api={api} />)
     expect(await screen.findByText('Acesso administrativo')).toBeTruthy()
     expect(screen.getByDisplayValue('splira@gmail.com')).toBeTruthy()
+  })
+
+  it('sempre envia magic link para o admin de produção', async () => {
+    const api = {
+      obterSessaoAdmin: vi.fn().mockResolvedValue({ session: null, isAdmin: false }),
+      enviarMagicLink: vi.fn().mockResolvedValue(),
+    }
+    render(<AdminApp api={api} />)
+    const botao = await screen.findByRole('button', { name: 'Enviar link de acesso' })
+    fireEvent.click(botao)
+    await waitFor(() => expect(api.enviarMagicLink).toHaveBeenCalledWith('splira@gmail.com', 'https://vale-decide.vercel.app/admin'))
   })
 
   it('mostra dashboard quando usuário é administrador e conclui cargas iniciais', async () => {
