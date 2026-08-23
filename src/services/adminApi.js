@@ -10,7 +10,7 @@ export function criarAdminApi(supabase = supabaseAdminClient) {
     async enviarMagicLink(email, redirectTo) {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { shouldCreateUser: false, emailRedirectTo: redirectTo },
+        options: { shouldCreateUser: true, emailRedirectTo: redirectTo },
       })
       if (error) throw error
     },
