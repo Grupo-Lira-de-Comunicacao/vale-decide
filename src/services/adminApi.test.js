@@ -42,4 +42,22 @@ describe('adminApi', () => {
     })
     expect(supabase.rpc).toHaveBeenCalledWith('is_admin')
   })
+
+  it('ordena acompanhamento editorial por updated_at', async () => {
+    const order = vi.fn().mockResolvedValue({ data: [], error: null })
+    const query = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      order,
+    }
+    query.select.mockReturnValue(query)
+    query.eq.mockReturnValue(query)
+    supabase.from.mockReturnValue(query)
+
+    const api = criarAdminApi(supabase)
+    await api.listar('editorial_tracking', { candidateId: 'candidate-1' })
+
+    expect(query.eq).toHaveBeenCalledWith('candidate_id', 'candidate-1')
+    expect(order).toHaveBeenCalledWith('updated_at', { ascending: false })
+  })
 })
