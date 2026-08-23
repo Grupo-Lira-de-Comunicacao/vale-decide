@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import AdminApp from './AdminApp.jsx'
 
@@ -11,7 +11,7 @@ describe('AdminApp', () => {
     expect(screen.getByDisplayValue('splira@gmail.com')).toBeTruthy()
   })
 
-  it('mostra dashboard quando usuário é administrador', async () => {
+  it('mostra dashboard quando usuário é administrador e conclui cargas iniciais', async () => {
     const api = {
       obterSessaoAdmin: vi.fn().mockResolvedValue({ session: { user: { email: 'splira@gmail.com' } }, isAdmin: true }),
       listarCandidatos: vi.fn().mockResolvedValue([]),
@@ -21,5 +21,7 @@ describe('AdminApp', () => {
     render(<AdminApp api={api} />)
     expect(await screen.findByText('Painel Vale Decide')).toBeTruthy()
     expect(screen.getAllByText('Candidatos').length).toBeGreaterThan(0)
+    await waitFor(() => expect(api.listarCandidatos).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(api.listar).toHaveBeenCalledWith('municipalities'))
   })
 })
