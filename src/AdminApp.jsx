@@ -6,6 +6,7 @@ const ADMIN_REDIRECT_URL = 'https://vale-decide.vercel.app/admin'
 
 const secoes = [
   ['candidates', 'Candidatos'],
+  ['candidate_municipalities', 'Municípios relacionados'],
   ['electoral_history', 'Histórico eleitoral'],
   ['candidate_sources', 'Fontes'],
   ['municipal_impact', 'Impacto municipal'],
@@ -24,6 +25,10 @@ const camposCandidato = [
 ]
 
 const camposPorTabela = {
+  candidate_municipalities: [
+    ['municipality_id', 'Município', 'municipality'], ['relationship_type', 'Tipo de relação'],
+    ['notes', 'Observações', 'textarea'], ['verified', 'Verificado', 'checkbox'],
+  ],
   electoral_history: [
     ['election_year', 'Ano', 'number'], ['office', 'Cargo'], ['municipality', 'Município'], ['votes', 'Votos', 'number'],
     ['result', 'Resultado'], ['source_url', 'Fonte (URL)'],
@@ -62,20 +67,31 @@ function Campo({ campo, value, onChange, municipios = [] }) {
   return <label>{label}<input type={tipo} value={value ?? ''} onChange={(e) => onChange(nome, e.target.value)} /></label>
 }
 
+function mensagemLogin(error) {
+  const texto = String(error?.message || '').toLowerCase()
+  if (texto.includes('rate limit')) return 'Muitas tentativas de envio em pouco tempo. Aguarde alguns minutos e tente novamente; não é necessário repetir vários cliques.'
+  return error?.message || 'Não foi possível enviar o link.'
+}
+
 function Login({ api }) {
   const [email, setEmail] = useState(ADMIN_EMAIL)
   const [estado, setEstado] = useState('')
+  const [enviando, setEnviando] = useState(false)
   async function entrar(e) {
     e.preventDefault()
+    if (enviando) return
     try {
+      setEnviando(true)
       setEstado('Enviando link seguro...')
       await api.enviarMagicLink(email.trim(), ADMIN_REDIRECT_URL)
-      setEstado('Link enviado. Abra o e-mail e clique para entrar.')
+      setEstado('Link enviado. Abra apenas o e-mail mais recente e clique para entrar.')
     } catch (error) {
-      setEstado(error.message || 'Não foi possível enviar o link.')
+      setEstado(mensagemLogin(error))
+    } finally {
+      setEnviando(false)
     }
   }
-  return <main className="admin-shell admin-login"><section className="admin-card"><span className="selo">VALE DECIDE</span><h1>Acesso administrativo</h1><p>Entre com o e-mail autorizado para editar a base eleitoral.</p><form onSubmit={entrar}><label>E-mail<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label><button className="admin-primary" type="submit">Enviar link de acesso</button></form>{estado && <p className="admin-status">{estado}</p>}<a href="/">← Voltar ao site público</a></section></main>
+  return <main className="admin-shell admin-login"><section className="admin-card"><span className="selo">VALE DECIDE</span><h1>Acesso administrativo</h1><p>Entre com o e-mail autorizado para editar a base eleitoral.</p><form onSubmit={entrar}><label>E-mail<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label><button className="admin-primary" type="submit" disabled={enviando}>{enviando ? 'Enviando...' : 'Enviar link de acesso'}</button></form>{estado && <p className="admin-status">{estado}</p>}<a href="/">← Voltar ao site público</a></section></main>
 }
 
 function Painel({ api, session }) {
@@ -142,11 +158,13 @@ function Painel({ api, session }) {
     } catch (error) { setMensagem(error.message || 'Erro ao excluir.') }
   }
 
+  const nomeMunicipio = (id) => municipios.find((m) => m.id === id)?.name
+
   return <main className="admin-shell"><header className="admin-top"><div><span className="selo">ADMIN</span><h1>Painel Vale Decide</h1><small>{session.user.email}</small></div><div className="admin-actions"><a href="/">Ver site</a><button onClick={async () => { await api.sair(); location.reload() }}>Sair</button></div></header>
     <nav className="admin-tabs">{secoes.map(([id, nome]) => <button key={id} className={secao === id ? 'ativo' : ''} onClick={() => setSecao(id)}>{nome}</button>)}</nav>
     {secao !== 'candidates' && <section className="admin-card"><label>Candidato<select value={candidatoId} onChange={(e) => setCandidatoId(e.target.value)}>{candidatos.map((c) => <option key={c.id} value={c.id}>{c.ballot_name} · {c.party}</option>)}</select></label>{candidatoAtual && <small>Editando dados relacionados a {candidatoAtual.ballot_name}</small>}</section>}
     <section className="admin-grid"><form className="admin-card admin-form" onSubmit={salvar}><h2>{form.id ? 'Editar registro' : 'Novo registro'}</h2>{campos.map((campo) => <Campo key={campo[0]} campo={campo} value={form[campo[0]]} municipios={municipios} onChange={(nome, valor) => setForm((atual) => ({ ...atual, [nome]: valor }))} />)}<div className="admin-form-actions"><button className="admin-primary" type="submit">Salvar</button>{form.id && <button type="button" onClick={() => setForm(valorInicial(campos))}>Cancelar</button>}</div>{mensagem && <p className="admin-status">{mensagem}</p>}</form>
-      <section className="admin-card admin-list"><h2>{secao === 'candidates' ? 'Candidatos' : 'Registros'}</h2>{registros.map((item) => <article key={item.id}><div><strong>{item.ballot_name || item.source_name || item.category || item.office || item.contact_status || 'Registro'}</strong><small>{item.party || item.result || item.status || item.source_type || item.interview_status || ''}</small></div><div><button onClick={() => editar(item)}>Editar</button><button className="perigo" onClick={() => excluir(item.id)}>Excluir</button></div></article>)}{!registros.length && <p>Nenhum registro cadastrado.</p>}</section>
+      <section className="admin-card admin-list"><h2>{secao === 'candidates' ? 'Candidatos' : 'Registros'}</h2>{registros.map((item) => <article key={item.id}><div><strong>{item.ballot_name || item.source_name || item.category || nomeMunicipio(item.municipality_id) || item.office || item.contact_status || 'Registro'}</strong><small>{item.party || item.relationship_type || item.result || item.status || item.source_type || item.interview_status || ''}</small></div><div><button onClick={() => editar(item)}>Editar</button><button className="perigo" onClick={() => excluir(item.id)}>Excluir</button></div></article>)}{!registros.length && <p>Nenhum registro cadastrado.</p>}</section>
     </section>
   </main>
 }
