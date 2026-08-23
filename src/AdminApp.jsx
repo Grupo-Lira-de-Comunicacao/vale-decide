@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { adminApi as defaultApi } from './services/adminApi.js'
 
 const ADMIN_EMAIL = 'splira@gmail.com'
+const ADMIN_REDIRECT_URL = 'https://vale-decide.vercel.app/admin'
 
 const secoes = [
   ['candidates', 'Candidatos'],
@@ -68,7 +69,7 @@ function Login({ api }) {
     e.preventDefault()
     try {
       setEstado('Enviando link seguro...')
-      await api.enviarMagicLink(email.trim(), `${window.location.origin}/admin`)
+      await api.enviarMagicLink(email.trim(), ADMIN_REDIRECT_URL)
       setEstado('Link enviado. Abra o e-mail e clique para entrar.')
     } catch (error) {
       setEstado(error.message || 'Não foi possível enviar o link.')
