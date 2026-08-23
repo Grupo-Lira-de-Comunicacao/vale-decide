@@ -24,7 +24,17 @@ describe('AdminApp', () => {
     await waitFor(() => expect(api.enviarMagicLink).toHaveBeenCalledWith('splira@gmail.com', 'https://vale-decide.vercel.app/admin'))
   })
 
-  it('mostra dashboard quando usuário é administrador e conclui cargas iniciais', async () => {
+  it('traduz rate limit do Supabase para mensagem amigável', async () => {
+    const api = {
+      obterSessaoAdmin: vi.fn().mockResolvedValue({ session: null, isAdmin: false }),
+      enviarMagicLink: vi.fn().mockRejectedValue(new Error('email rate limit exceeded')),
+    }
+    render(<AdminApp api={api} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Enviar link de acesso' }))
+    expect(await screen.findByText(/Muitas tentativas de envio/i)).toBeTruthy()
+  })
+
+  it('mostra dashboard com gestão de municípios quando usuário é administrador', async () => {
     const api = {
       obterSessaoAdmin: vi.fn().mockResolvedValue({ session: { user: { email: 'splira@gmail.com' } }, isAdmin: true }),
       listarCandidatos: vi.fn().mockResolvedValue([]),
@@ -34,6 +44,7 @@ describe('AdminApp', () => {
     render(<AdminApp api={api} />)
     expect(await screen.findByText('Painel Vale Decide')).toBeTruthy()
     expect(screen.getAllByText('Candidatos').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Municípios relacionados' })).toBeTruthy()
     await waitFor(() => expect(api.listarCandidatos).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(api.listar).toHaveBeenCalledWith('municipalities'))
   })
