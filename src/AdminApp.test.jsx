@@ -1,7 +1,9 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import AdminApp from './AdminApp.jsx'
+
+afterEach(() => cleanup())
 
 describe('AdminApp', () => {
   it('mostra login quando usuário não está autenticado', async () => {
