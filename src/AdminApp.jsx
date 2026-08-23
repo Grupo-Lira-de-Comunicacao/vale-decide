@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { adminApi as defaultApi } from './services/adminApi.js'
 
 const ADMIN_EMAIL = 'splira@gmail.com'
