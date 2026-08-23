@@ -16,13 +16,13 @@ describe('adminApi', () => {
     }
   })
 
-  it('envia magic link sem criar usuários desconhecidos', async () => {
+  it('envia magic link permitindo criar o primeiro usuário Auth', async () => {
     supabase.auth.signInWithOtp.mockResolvedValue({ error: null })
     const api = criarAdminApi(supabase)
     await api.enviarMagicLink('splira@gmail.com', 'https://vale-decide.vercel.app/admin')
     expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith({
       email: 'splira@gmail.com',
-      options: { shouldCreateUser: false, emailRedirectTo: 'https://vale-decide.vercel.app/admin' },
+      options: { shouldCreateUser: true, emailRedirectTo: 'https://vale-decide.vercel.app/admin' },
     })
   })
 
