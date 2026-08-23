@@ -14,11 +14,12 @@ describe('AdminApp', () => {
   it('mostra dashboard quando usuário é administrador', async () => {
     const api = {
       obterSessaoAdmin: vi.fn().mockResolvedValue({ session: { user: { email: 'splira@gmail.com' } }, isAdmin: true }),
+      listarCandidatos: vi.fn().mockResolvedValue([]),
       listar: vi.fn().mockResolvedValue([]),
       sair: vi.fn(),
     }
     render(<AdminApp api={api} />)
     expect(await screen.findByText('Painel Vale Decide')).toBeTruthy()
-    expect(screen.getByText('Candidatos')).toBeTruthy()
+    expect(screen.getAllByText('Candidatos').length).toBeGreaterThan(0)
   })
 })
