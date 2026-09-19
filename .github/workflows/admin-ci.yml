@@ -1,9 +1,10 @@
-name: Vale Decide Admin CI
+name: Fala Vale CI
 
 on:
   push:
     branches:
-      - codex/vale-decide-admin-v1
+      - main
+      - "feat/**"
   pull_request:
     branches:
       - main
@@ -16,7 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - run: npm install
       - run: npm test
       - run: npm run build
