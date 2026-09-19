@@ -1,9 +1,10 @@
-name: Vale Decide Admin CI
+name: Fala Vale CI
 
 on:
   push:
     branches:
-      - codex/vale-decide-admin-v1
+      - main
+      - "feat/**"
   pull_request:
     branches:
       - main
